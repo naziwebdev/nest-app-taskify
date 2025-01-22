@@ -3,7 +3,11 @@ import {
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+
+import { User } from '../users/user.entity';
 
 @Entity({ name: 'projects' })
 export class Project {
@@ -15,6 +19,9 @@ export class Project {
 
   @Column({ nullable: true })
   description: string;
+
+  @ManyToOne(() => User, (user) => user.projects, { nullable: false })
+  creator: User;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

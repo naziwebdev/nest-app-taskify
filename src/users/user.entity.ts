@@ -3,8 +3,10 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  OneToMany
 } from 'typeorm';
 import { RoleUserEnum } from './enums/roleUserEnum';
+import {Project} from '../projects/project.entity'
 
 @Entity({ name: 'users' })
 export class User {
@@ -30,6 +32,9 @@ export class User {
     nullable: false,
   })
   role: RoleUserEnum;
+
+  @OneToMany(() => Project , (project)=>project.creator)
+  projects:Project[]
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
