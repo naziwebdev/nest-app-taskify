@@ -6,26 +6,34 @@ import {
 } from 'typeorm';
 import { RoleUserEnum } from './enums/roleUserEnum';
 
-@Entity()
+@Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: false })
   username: string;
 
-  @Column()
+  @Column({ nullable: false })
   email: string;
 
-  @Column()
+  @Column({ nullable: false })
   phone: string;
 
-  @Column()
+  @Column({ nullable: false })
   password: string;
 
-  @Column({ type: 'enum', enum: RoleUserEnum, default: RoleUserEnum.USER })
+  @Column({
+    type: 'enum',
+    enum: RoleUserEnum,
+    default: RoleUserEnum.USER,
+    nullable: false,
+  })
   role: RoleUserEnum;
-  
-  @CreateDateColumn()
-  created_at: Date;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @CreateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 }
