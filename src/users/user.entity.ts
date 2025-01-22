@@ -3,10 +3,10 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  OneToMany
+  OneToMany,
 } from 'typeorm';
 import { RoleUserEnum } from './enums/roleUserEnum';
-import {Project} from '../projects/project.entity'
+import { Project } from '../projects/project.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -33,12 +33,20 @@ export class User {
   })
   role: RoleUserEnum;
 
-  @OneToMany(() => Project , (project)=>project.creator)
-  projects:Project[]
+  @OneToMany(() => Project, (project) => project.creator)
+  projects: Project[];
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({
+    name: 'created_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   createdAt: Date;
 
-  @CreateDateColumn({ name: 'updated_at' })
+  @CreateDateColumn({
+    name: 'updated_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   updatedAt: Date;
 }
