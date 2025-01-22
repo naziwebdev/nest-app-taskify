@@ -4,9 +4,12 @@ import {
   Column,
   CreateDateColumn,
   OneToMany,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { RoleUserEnum } from './enums/roleUserEnum';
 import { Project } from '../projects/project.entity';
+import { Task } from 'src/tasks/task.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -35,6 +38,10 @@ export class User {
 
   @OneToMany(() => Project, (project) => project.creator)
   projects: Project[];
+
+  @ManyToMany(() => Task, (task) => task.users)
+  @JoinTable()
+  tasks: Task[];
 
   @CreateDateColumn({
     name: 'created_at',

@@ -4,9 +4,12 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   ManyToOne,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { TasStatusEnum } from './enums/taskStatusEnum';
 import { Project } from 'src/projects/project.entity';
+import { User } from 'src/users/user.entity';
 
 @Entity({ name: 'tasks' })
 export class Task {
@@ -36,6 +39,9 @@ export class Task {
 
   @ManyToOne(() => Project, (project) => project.tasks, { nullable: false })
   project: Project;
+
+  @ManyToMany(() => User, (user) => user.tasks)
+  users: User[];
 
   @CreateDateColumn({
     name: 'created_at',
