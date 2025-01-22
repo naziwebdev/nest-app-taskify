@@ -11,7 +11,7 @@ import {
 
 import { TasStatusEnum } from '../enums/taskStatusEnum';
 
-export class CreateTaskDto {
+export class UpdateTaskDto {
   @IsString()
   @MinLength(3)
   @MaxLength(50)
