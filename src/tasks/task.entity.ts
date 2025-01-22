@@ -3,8 +3,10 @@ import {
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
+  ManyToOne,
 } from 'typeorm';
 import { TasStatusEnum } from './enums/taskStatusEnum';
+import { Project } from 'src/projects/project.entity';
 
 @Entity({ name: 'tasks' })
 export class Task {
@@ -31,6 +33,9 @@ export class Task {
     default: () => 'CURRENT_TIMESTAMP',
   })
   deadline: Date;
+
+  @ManyToOne(() => Project, (project) => project.tasks, { nullable: false })
+  project: Project;
 
   @CreateDateColumn({
     name: 'created_at',

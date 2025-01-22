@@ -4,10 +4,11 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   ManyToOne,
-  JoinColumn,
+  OneToMany,
 } from 'typeorm';
 
 import { User } from '../users/user.entity';
+import { Task } from 'src/tasks/task.entity';
 
 @Entity({ name: 'projects' })
 export class Project {
@@ -22,6 +23,9 @@ export class Project {
 
   @ManyToOne(() => User, (user) => user.projects, { nullable: false })
   creator: User;
+
+  @OneToMany(() => Task, (task) => task.project)
+  tasks: Task[];
 
   @CreateDateColumn({
     name: 'created_at',
