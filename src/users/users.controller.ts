@@ -1,9 +1,14 @@
-import { Body, Controller, Post, Res, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Post, Res, HttpStatus, Get } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { Response } from 'express';
 import { Session } from '@nestjs/common';
 import { LoginDto } from './dtos/login.dto';
+import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { User } from './user.entity';
+
+//auth => middleware + decorator
+//authorization => guard
 
 @Controller('auth')
 export class UsersController {
@@ -40,5 +45,10 @@ export class UsersController {
       statusCode: HttpStatus.OK,
       message: 'user login successfully',
     });
+  }
+
+  @Get('/me')
+  getMe(@CurrentUser() user: User) {
+    return user;
   }
 }
