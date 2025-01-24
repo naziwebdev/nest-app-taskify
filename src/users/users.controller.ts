@@ -1,4 +1,12 @@
-import { Body, Controller, Post, Res, HttpStatus, Get } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Res,
+  HttpStatus,
+  Get,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { Response } from 'express';
@@ -7,8 +15,11 @@ import { LoginDto } from './dtos/login.dto';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { User } from './user.entity';
 import { plainToClass } from 'class-transformer';
-//auth => middleware + decorator
-//authorization => guard
+import { AuthGuard } from 'src/guards/auth.guard';
+
+//middleware => just set user on req
+//decorator => get user data in handler paramter
+//authorization & authentication => guard (get user from req)
 
 @Controller('auth')
 export class UsersController {
@@ -48,7 +59,12 @@ export class UsersController {
   }
 
   @Get('/me')
+  //authGuard is for if user was not login dont access from this route
+  @UseGuards(AuthGuard)
+  //currentUser is decoretor for get user from req
+  //if in handler need to user data that is login we must use decorator and dont can get user data from authGuard
   getMe(@CurrentUser() user: User, @Res() res: Response) {
+    //custom response and remove password from user with plainToClass
     const mainUser = plainToClass(User, user);
     return res.status(HttpStatus.OK).json({
       data: mainUser,
