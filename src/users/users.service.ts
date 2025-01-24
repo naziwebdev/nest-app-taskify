@@ -2,12 +2,15 @@ import {
   Injectable,
   InternalServerErrorException,
   ConflictException,
+  NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import * as bcrypt from 'bcryptjs';
 import { CreateUserDto } from './dtos/create-user.dto';
+import { LoginDto } from './dtos/login.dto';
 import { RoleUserEnum } from './enums/roleUserEnum';
 
 @Injectable()
@@ -19,9 +22,9 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
-  private async checkUserExist(userData: CreateUserDto) {
+  private async checkUserExist(email: string, phone: string) {
     const user = await this.usersRepository.findOne({
-      where: [{ email: userData.email }, { phone: userData.phone }],
+      where: [{ email }, { phone }],
     });
 
     return user;
@@ -50,7 +53,7 @@ export class UsersService {
 
   async register(userData: CreateUserDto) {
     try {
-      const user = await this.checkUserExist(userData);
+      const user = await this.checkUserExist(userData.email, userData.phone);
       if (user) {
         throw new ConflictException('user already registered');
       }
@@ -66,6 +69,27 @@ export class UsersService {
       );
 
       return this.usersRepository.save(newUser);
+    } catch (error) {
+      throw new InternalServerErrorException('Error creating user');
+    }
+  }
+
+  async login(userData: LoginDto) {
+    try {
+      const user = await this.checkUserExist(userData.email, userData.phone);
+      if (!user) {
+        throw new NotFoundException('not found user');
+      }
+
+      const validPassword = await bcrypt.compare(
+        userData.password,
+        user.password,
+      );
+      if (!validPassword) {
+        throw new BadRequestException('invalid email | phone | password');
+      }
+
+      return user;
     } catch (error) {
       throw new InternalServerErrorException('Error creating user');
     }

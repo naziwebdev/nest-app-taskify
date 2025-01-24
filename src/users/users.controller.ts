@@ -3,6 +3,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { Response } from 'express';
 import { Session } from '@nestjs/common';
+import { LoginDto } from './dtos/login.dto';
 
 @Controller('auth')
 export class UsersController {
@@ -22,6 +23,22 @@ export class UsersController {
       data: newUser,
       statusCode: HttpStatus.CREATED,
       message: 'user created successfully',
+    });
+  }
+
+  @Post('/login')
+  async login(
+    @Body() body: LoginDto,
+    @Session() session: any,
+    @Res() res: Response,
+  ) {
+    const user = await this.usersService.login(body);
+    session.userId = user.id;
+
+    return res.status(HttpStatus.OK).json({
+      data: user,
+      statusCode: HttpStatus.OK,
+      message: 'user login successfully',
     });
   }
 }
