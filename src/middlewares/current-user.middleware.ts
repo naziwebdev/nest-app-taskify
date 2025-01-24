@@ -11,6 +11,9 @@ declare global {
   }
 }
 
+//this just set user on req ... after with custom decorator get user from req
+//for set user on req must use middleware and for roleGuard must use Gaurd beacuse middleware execute before Gurad
+
 @Injectable()
 export class CurrentUserMiddleware implements NestMiddleware {
   constructor(private readonly usersService: UsersService) {}
