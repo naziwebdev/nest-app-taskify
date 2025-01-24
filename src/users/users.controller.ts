@@ -16,10 +16,12 @@ import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { User } from './user.entity';
 import { plainToClass } from 'class-transformer';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { AdminGuard } from 'src/guards/admin.guard';
 
 //middleware => just set user on req
 //decorator => get user data in handler paramter
-//authorization & authentication => guard (get user from req)
+//authorization & authentication => route protection (user be login|user be admin)
+//we can't get user data in handler with guards and guard just doing route protection.. for get user data in handler must use from decorator
 
 @Controller('auth')
 export class UsersController {
@@ -62,7 +64,7 @@ export class UsersController {
   //authGuard is for if user was not login dont access from this route
   @UseGuards(AuthGuard)
   //currentUser is decoretor for get user from req
-  //if in handler need to user data that is login we must use decorator and dont can get user data from authGuard
+  //if in handler we need to user data that is login we must use decorator and dont can get user data from authGuard
   getMe(@CurrentUser() user: User, @Res() res: Response) {
     //custom response and remove password from user with plainToClass
     const mainUser = plainToClass(User, user);
