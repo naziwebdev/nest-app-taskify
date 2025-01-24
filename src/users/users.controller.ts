@@ -6,7 +6,7 @@ import { Session } from '@nestjs/common';
 import { LoginDto } from './dtos/login.dto';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { User } from './user.entity';
-
+import { plainToClass } from 'class-transformer';
 //auth => middleware + decorator
 //authorization => guard
 
@@ -48,7 +48,12 @@ export class UsersController {
   }
 
   @Get('/me')
-  getMe(@CurrentUser() user: User) {
-    return user;
+  getMe(@CurrentUser() user: User, @Res() res: Response) {
+    const mainUser = plainToClass(User, user);
+    return res.status(HttpStatus.OK).json({
+      data: mainUser,
+      statusCode: HttpStatus.OK,
+      message: 'user data send successfully',
+    });
   }
 }

@@ -12,6 +12,7 @@ import * as bcrypt from 'bcryptjs';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { LoginDto } from './dtos/login.dto';
 import { RoleUserEnum } from './enums/roleUserEnum';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class UsersService {
@@ -61,8 +62,8 @@ export class UsersService {
 
   async register(userData: CreateUserDto) {
     try {
-      const user = await this.checkUserExist(userData.email, userData.phone);
-      if (user) {
+      const userExist = await this.checkUserExist(userData.email, userData.phone);
+      if (userExist) {
         throw new ConflictException('user already registered');
       }
 
@@ -76,7 +77,8 @@ export class UsersService {
         usersCount,
       );
 
-      return this.usersRepository.save(newUser);
+      const user = await this.usersRepository.save(newUser);
+      return plainToClass(User, user);
     } catch (error) {
       throw new InternalServerErrorException('Error creating user');
     }
@@ -97,7 +99,7 @@ export class UsersService {
         throw new BadRequestException('invalid email | phone | password');
       }
 
-      return user;
+      return plainToClass(User, user);
     } catch (error) {
       throw new InternalServerErrorException('Error creating user');
     }

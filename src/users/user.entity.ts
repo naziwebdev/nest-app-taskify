@@ -10,6 +10,7 @@ import {
 import { RoleUserEnum } from './enums/roleUserEnum';
 import { Project } from '../projects/project.entity';
 import { Task } from 'src/tasks/task.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity({ name: 'users' })
 export class User {
@@ -26,6 +27,7 @@ export class User {
   phone: string;
 
   @Column({ nullable: false })
+  @Exclude()
   password: string;
 
   @Column({
