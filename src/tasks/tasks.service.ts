@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Task } from './task.entity';
 import { Project } from 'src/projects/project.entity';
 import { User } from 'src/users/user.entity';
@@ -21,6 +25,18 @@ export class TasksService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
+
+  async isCreatorOfProject(projectId, userId) {
+    const creator = await this.projectRepository.findOne({
+      where: { creator: { id: userId }, id: projectId },
+    });
+
+    console.log(creator);
+
+    if (!creator) {
+      throw new UnauthorizedException('you forbidden access from this route');
+    }
+  }
 
   async create(taskData: CreateTaskDto) {
     const userIds = taskData.usersId;
@@ -48,6 +64,7 @@ export class TasksService {
     });
 
     task.project = project;
+    //m:m relation creating raw
     task.users = users;
 
     const savedTask = await this.tasksRepository.save(task);

@@ -19,6 +19,7 @@ import { UpdateTaskStatusDto } from './dtos/update-task-status.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { Response } from 'express';
+import { User } from 'src/users/user.entity';
 
 @Controller('tasks')
 export class TasksController {
@@ -26,7 +27,12 @@ export class TasksController {
 
   @Post()
   @UseGuards(AuthGuard)
-  async create(@Body() body: CreateTaskDto, @Res() res: Response) {
+  async create(
+    @Body() body: CreateTaskDto,
+    @CurrentUser() user: User,
+    @Res() res: Response,
+  ) {
+    await this.tasksService.isCreatorOfProject(body.projectId, user.id);
     const task = await this.tasksService.create(body);
     return res.status(HttpStatus.CREATED).json({
       data: task,
