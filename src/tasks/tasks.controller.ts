@@ -26,11 +26,23 @@ export class TasksController {
 
   @Post()
   @UseGuards(AuthGuard)
-  async create(@Body() body: CreateTaskDto, @Res() res: Response) {}
+  async create(@Body() body: CreateTaskDto, @Res() res: Response) {
+    const task = await this.tasksService.create(body);
+    return res.status(HttpStatus.CREATED).json({
+      data: task,
+      statusCode: HttpStatus.CREATED,
+      message: 'task created successfully',
+    });
+  }
 
   @Get('/:project_id/tasks')
   @UseGuards(AuthGuard)
-  async getAll(@Param('project_id') projectId: string, @Res() res: Response) {}
+  async getAll(
+    @Param('project_id') projectId: string,
+    @Query('limit') limit: string,
+    @Query('page') page: string,
+    @Res() res: Response,
+  ) {}
 
   @Get('/:task_id')
   @UseGuards(AuthGuard)

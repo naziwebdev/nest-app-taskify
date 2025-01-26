@@ -12,6 +12,7 @@ import {
   IsNumber,
   IsArray,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateTaskDto {
   @IsString()
@@ -28,6 +29,7 @@ export class CreateTaskDto {
 
   @IsDate()
   @IsNotEmpty()
+  @Type(() => Date) // Transform string to Date
   deadline: Date;
 
   @IsNumber()
