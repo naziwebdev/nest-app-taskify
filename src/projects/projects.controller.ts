@@ -77,7 +77,14 @@ export class ProjectsController {
     @Param('id') id: string,
     @Body() body: UpdateProjectDto,
     @Res() res: Response,
-  ) {}
+  ) {
+    const updatedProject = await this.projectsService.update(body, parseInt(id));
+    return res.status(HttpStatus.OK).json({
+      data: updatedProject,
+      statusCode: HttpStatus.OK,
+      message: 'project sent  successfully',
+    });
+  }
 
   @Delete('/:id')
   @UseGuards(AuthGuard)

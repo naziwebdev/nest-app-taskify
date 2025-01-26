@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Project } from './project.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -39,16 +43,27 @@ export class ProjectsService {
 
       return userProjects;
     } catch (error) {
-      throw new InternalServerErrorException('Error create project');
+      throw new InternalServerErrorException('Error get projects');
     }
   }
 
   async getProjectById(id: number) {
-    try {
-      const project = await this.projectsRepository.findOne({ where: { id } });
-      return project;
-    } catch (error) {
-      throw new InternalServerErrorException('Error create project');
+    const project = await this.projectsRepository.findOne({ where: { id } });
+    //if use try-catch expetions don't work !!!
+    if (!project) {
+      throw new NotFoundException('not found project');
     }
+    return project;
+  }
+
+  async update(projectData: UpdateProjectDto, id: number) {
+    const updatedProject = await this.projectsRepository.update(
+      id,
+      projectData,
+    );
+    if (updatedProject.affected === 0) {
+      throw new NotFoundException('Project not found');
+    }
+    return this.projectsRepository.findOne({ where: { id } });
   }
 }
