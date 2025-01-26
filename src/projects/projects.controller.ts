@@ -8,12 +8,15 @@ import {
   Body,
   UseGuards,
   Param,
+  HttpStatus,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dtos/create-project.dto';
 import { UpdateProjectDto } from './dtos/update-project.dto';
 import { Response } from 'express';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { User } from 'src/users/user.entity';
 
 @Controller('projects')
 export class ProjectsController {
@@ -21,7 +24,19 @@ export class ProjectsController {
 
   @Post()
   @UseGuards(AuthGuard)
-  async create(@Body() body: CreateProjectDto, @Res() res: Response) {}
+  async create(
+    @Body() body: CreateProjectDto,
+    @CurrentUser() user: User,
+    @Res() res: Response,
+  ) {
+    const project = await this.projectsService.create(body, user);
+
+    return res.status(HttpStatus.CREATED).json({
+      data: project,
+      statusCode: HttpStatus.CREATED,
+      message: 'project created successfully',
+    });
+  }
 
   @Get()
   @UseGuards(AuthGuard)
