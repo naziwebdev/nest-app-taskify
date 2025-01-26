@@ -36,6 +36,23 @@ export class TasksService {
     }
   }
 
+  async isOwnTask(userId: number, taskId: number) {
+    const task = await this.tasksRepository
+      .createQueryBuilder('tasks')
+      .innerJoinAndSelect('tasks.users', 'users')
+      .where('tasks.id = :taskId', { taskId })
+      .andWhere('users.id = :userId', { userId })
+      .getOne();
+
+    if (!task) {
+      throw new NotFoundException(
+        'Task not found or user not associated with task',
+      );
+    }
+
+    return task;
+  }
+
   async create(taskData: CreateTaskDto) {
     const userIds = taskData.usersId;
     const project = await this.projectRepository.findOne({
@@ -94,5 +111,18 @@ export class TasksService {
     });
 
     return transformedTasks;
+  }
+
+  async getOneTask(id: number) {
+    const task = await this.tasksRepository.findOne({
+      where: { id },
+      relations: ['users'],
+    });
+    if (!task) {
+      throw new NotFoundException('not found task');
+    }
+    task.users = plainToInstance(User, task.users);
+
+    return task;
   }
 }

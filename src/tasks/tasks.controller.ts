@@ -62,13 +62,25 @@ export class TasksController {
     return res.status(HttpStatus.OK).json({
       data: tasks,
       statusCode: HttpStatus.OK,
-      message: 'task find successfully',
+      message: 'tasks find successfully',
     });
   }
 
   @Get('/:task_id')
   @UseGuards(AuthGuard)
-  async getOne(@Param('task_id') id: string, @Res() res: Response) {}
+  async getOne(
+    @Param('task_id') id: string,
+    @CurrentUser() user: User,
+    @Res() res: Response,
+  ) {
+    await this.tasksService.isOwnTask(user.id, parseInt(id));
+    const task = await this.tasksService.getOneTask(parseInt(id));
+    return res.status(HttpStatus.OK).json({
+      data: task,
+      statusCode: HttpStatus.OK,
+      message: 'task find successfully',
+    });
+  }
 
   @Put('/:task_id')
   @UseGuards(AuthGuard)
