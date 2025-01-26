@@ -61,7 +61,15 @@ export class ProjectsController {
 
   @Get('/:id')
   @UseGuards(AuthGuard)
-  async getOneProject(@Param('id') id: string, @Res() res: Response) {}
+  async getOneProject(@Param('id') id: string, @Res() res: Response) {
+    const project = await this.projectsService.getProjectById(parseInt(id));
+
+    return res.status(HttpStatus.OK).json({
+      data: project,
+      statusCode: HttpStatus.OK,
+      message: 'project sent  successfully',
+    });
+  }
 
   @Put('/:id')
   @UseGuards(AuthGuard)

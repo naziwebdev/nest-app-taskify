@@ -42,4 +42,13 @@ export class ProjectsService {
       throw new InternalServerErrorException('Error create project');
     }
   }
+
+  async getProjectById(id: number) {
+    try {
+      const project = await this.projectsRepository.findOne({ where: { id } });
+      return project;
+    } catch (error) {
+      throw new InternalServerErrorException('Error create project');
+    }
+  }
 }
