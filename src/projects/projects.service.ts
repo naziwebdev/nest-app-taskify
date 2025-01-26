@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateProjectDto } from './dtos/create-project.dto';
 import { UpdateProjectDto } from './dtos/update-project.dto';
 import { User } from 'src/users/user.entity';
-import { plainToClass, instanceToPlain } from 'class-transformer';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class ProjectsService {
@@ -24,6 +24,20 @@ export class ProjectsService {
       savedProject.creator = plainToClass(User, savedProject.creator);
 
       return savedProject;
+    } catch (error) {
+      throw new InternalServerErrorException('Error create project');
+    }
+  }
+
+  async getUserProjects(creator: number, limit: number = 2, page: number = 1) {
+    try {
+      const userProjects = await this.projectsRepository.find({
+        where: { creator: { id: creator } },
+        take: limit,
+        skip: (page - 1) * limit,
+      });
+
+      return userProjects;
     } catch (error) {
       throw new InternalServerErrorException('Error create project');
     }

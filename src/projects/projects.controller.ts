@@ -8,6 +8,7 @@ import {
   Body,
   UseGuards,
   Param,
+  Query,
   HttpStatus,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
@@ -40,7 +41,23 @@ export class ProjectsController {
 
   @Get()
   @UseGuards(AuthGuard)
-  async getUserProjects(@Res() res: Response) {}
+  async getUserProjects(
+    @CurrentUser() user: User,
+    @Query('limit') limit: string,
+    @Query('page') page: string,
+    @Res() res: Response,
+  ) {
+    const userProjects = await this.projectsService.getUserProjects(
+      user.id,
+      parseInt(limit),
+      parseInt(page),
+    );
+    return res.status(HttpStatus.OK).json({
+      data: userProjects,
+      statusCode: HttpStatus.OK,
+      message: 'userProject sent  successfully',
+    });
+  }
 
   @Get('/:id')
   @UseGuards(AuthGuard)
