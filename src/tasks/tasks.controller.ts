@@ -32,6 +32,7 @@ export class TasksController {
     @CurrentUser() user: User,
     @Res() res: Response,
   ) {
+    //check that task creator be project creator
     await this.tasksService.isCreatorOfProject(body.projectId, user.id);
     const task = await this.tasksService.create(body);
     return res.status(HttpStatus.CREATED).json({
@@ -47,8 +48,23 @@ export class TasksController {
     @Param('project_id') projectId: string,
     @Query('limit') limit: string,
     @Query('page') page: string,
+    @CurrentUser() user: User,
     @Res() res: Response,
-  ) {}
+  ) {
+    await this.tasksService.isCreatorOfProject(parseInt(projectId), user.id);
+
+    const tasks = await this.tasksService.getProjectTasks(
+      parseInt(projectId),
+      parseInt(limit),
+      parseInt(page),
+    );
+
+    return res.status(HttpStatus.OK).json({
+      data: tasks,
+      statusCode: HttpStatus.OK,
+      message: 'task find successfully',
+    });
+  }
 
   @Get('/:task_id')
   @UseGuards(AuthGuard)

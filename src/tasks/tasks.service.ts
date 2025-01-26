@@ -26,12 +26,10 @@ export class TasksService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async isCreatorOfProject(projectId, userId) {
+  async isCreatorOfProject(projectId: number, userId: number) {
     const creator = await this.projectRepository.findOne({
       where: { creator: { id: userId }, id: projectId },
     });
-
-    console.log(creator);
 
     if (!creator) {
       throw new UnauthorizedException('you forbidden access from this route');
@@ -71,5 +69,30 @@ export class TasksService {
     savedTask.users = plainToInstance(User, savedTask.users);
 
     return savedTask;
+  }
+
+  async getProjectTasks(projectId: number, limit: number, page: number) {
+    const project = await this.projectRepository.findOne({
+      where: { id: projectId },
+    });
+
+    if (!project) {
+      throw new NotFoundException('not found project');
+    }
+
+    const tasks = await this.tasksRepository.find({
+      where: { project: project },
+      relations: ['users'],
+      take: limit,
+      skip: (page - 1) * limit,
+    });
+
+    // Transform users to exclude password
+    const transformedTasks = tasks.map((task) => {
+      task.users = plainToInstance(User, task.users);
+      return task;
+    });
+
+    return transformedTasks;
   }
 }
