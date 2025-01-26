@@ -66,4 +66,11 @@ export class ProjectsService {
     }
     return this.projectsRepository.findOne({ where: { id } });
   }
+
+  async remove(id: number) {
+    const removedProject = await this.projectsRepository.delete(id);
+    if (removedProject.affected === 0) {
+      throw new NotFoundException('not found project');
+    }
+  }
 }

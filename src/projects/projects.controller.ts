@@ -78,15 +78,25 @@ export class ProjectsController {
     @Body() body: UpdateProjectDto,
     @Res() res: Response,
   ) {
-    const updatedProject = await this.projectsService.update(body, parseInt(id));
+    const updatedProject = await this.projectsService.update(
+      body,
+      parseInt(id),
+    );
     return res.status(HttpStatus.OK).json({
       data: updatedProject,
       statusCode: HttpStatus.OK,
-      message: 'project sent  successfully',
+      message: 'project updated  successfully',
     });
   }
 
   @Delete('/:id')
   @UseGuards(AuthGuard)
-  async remove(@Param('id') id: string, @Res() res: Response) {}
+  async remove(@Param('id') id: string, @Res() res: Response) {
+    await this.projectsService.remove(parseInt(id));
+    return res.status(HttpStatus.OK).json({
+      data: null,
+      statusCode: HttpStatus.OK,
+      message: 'project removed  successfully',
+    });
+  }
 }
