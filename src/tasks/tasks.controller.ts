@@ -87,8 +87,17 @@ export class TasksController {
   async update(
     @Param('task_id') id: string,
     @Body() body: UpdateTaskDto,
+    @CurrentUser() user: User,
     @Res() res: Response,
-  ) {}
+  ) {
+    await this.tasksService.isCreatorOfProject(body.projectId, user.id);
+    const updatedTask = await this.tasksService.updateTask(parseInt(id), body);
+    return res.status(HttpStatus.OK).json({
+      data: updatedTask,
+      statusCode: HttpStatus.OK,
+      message: 'task updated successfully',
+    });
+  }
 
   @Patch('/:task_id/status')
   @UseGuards(AuthGuard)

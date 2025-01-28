@@ -125,4 +125,54 @@ export class TasksService {
 
     return task;
   }
+
+  async updateTask(id: number, taskData: UpdateTaskDto) {
+    const { usersId, projectId, ...taskFields } = taskData;
+
+    let project = null;
+    if (projectId) {
+      project = await this.projectRepository.findOne({
+        where: { id: projectId },
+      });
+
+      if (!project) {
+        throw new NotFoundException('not found project');
+      }
+    }
+
+    let users = [];
+    if (usersId && usersId.length > 0) {
+      users = await this.userRepository.find({
+        where: usersId.map((id) => ({ id })),
+      });
+
+      if (usersId.length !== users.length) {
+        throw new NotFoundException('one or more user not found');
+      }
+    }
+
+    const task = await this.tasksRepository.findOne({
+      where: { id },
+      relations: ['users', 'project'],
+    });
+
+    if (!task) {
+      throw new NotFoundException('not found task');
+    }
+
+    Object.assign(task, taskFields);
+
+    if (project) {
+      task.project = project;
+    }
+
+    if (users.length > 0) {
+      task.users = users;
+    }
+
+    const updatedTask = await this.tasksRepository.save(task);
+    updatedTask.users = plainToInstance(User, updatedTask.users);
+
+    return updatedTask;
+  }
 }
