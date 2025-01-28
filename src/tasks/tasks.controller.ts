@@ -104,8 +104,18 @@ export class TasksController {
   async updateStatusTask(
     @Param('task_id') id: string,
     @Body() body: UpdateTaskStatusDto,
+    @CurrentUser() user: User,
     @Res() res: Response,
-  ) {}
+  ) {
+
+    await this.tasksService.isOwnTask(user.id,parseInt(id))
+    const updatedTaskStatus = await this.tasksService.updateStatus(parseInt(id),body.status)
+    return res.status(HttpStatus.OK).json({
+      data: updatedTaskStatus,
+      statusCode: HttpStatus.OK,
+      message: 'status task updated successfully',
+    });
+  }
 
   @Delete('/:task_id')
   @UseGuards(AuthGuard)

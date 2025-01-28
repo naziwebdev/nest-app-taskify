@@ -175,4 +175,18 @@ export class TasksService {
 
     return updatedTask;
   }
+
+  async updateStatus(id: number, status: TasStatusEnum) {
+    
+    const task = await this.tasksRepository.findOne({ where: { id } });
+    if (!task) {
+      throw new NotFoundException('not found task');
+    }
+
+    task.status = status;
+
+    const updateTaskStatus = await this.tasksRepository.save(task);
+
+    return updateTaskStatus;
+  }
 }
