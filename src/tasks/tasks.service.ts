@@ -116,7 +116,7 @@ export class TasksService {
   async getOneTask(id: number) {
     const task = await this.tasksRepository.findOne({
       where: { id },
-      relations: ['users'],
+      relations: ['users','project'],
     });
     if (!task) {
       throw new NotFoundException('not found task');
@@ -188,5 +188,12 @@ export class TasksService {
     const updateTaskStatus = await this.tasksRepository.save(task);
 
     return updateTaskStatus;
+  }
+
+  async removeTask(id:number){
+   const removedTask = await this.tasksRepository.delete(id)
+   if (removedTask.affected === 0) {
+    throw new NotFoundException('not found project');
+  }
   }
 }

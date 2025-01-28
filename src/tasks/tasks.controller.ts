@@ -11,6 +11,7 @@ import {
   HttpStatus,
   UseGuards,
   Body,
+  NotFoundException,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dtos/create-task.dto';
@@ -107,9 +108,11 @@ export class TasksController {
     @CurrentUser() user: User,
     @Res() res: Response,
   ) {
-
-    await this.tasksService.isOwnTask(user.id,parseInt(id))
-    const updatedTaskStatus = await this.tasksService.updateStatus(parseInt(id),body.status)
+    await this.tasksService.isOwnTask(user.id, parseInt(id));
+    const updatedTaskStatus = await this.tasksService.updateStatus(
+      parseInt(id),
+      body.status,
+    );
     return res.status(HttpStatus.OK).json({
       data: updatedTaskStatus,
       statusCode: HttpStatus.OK,
@@ -119,5 +122,23 @@ export class TasksController {
 
   @Delete('/:task_id')
   @UseGuards(AuthGuard)
-  async remove(@Param('task_id') id: string, @Res() res: Response) {}
+  async remove(
+    @Param('task_id') id: string,
+    @CurrentUser() user: User,
+    @Res() res: Response,
+  ) {
+    const task = await this.tasksService.getOneTask(parseInt(id));
+    if (!task) {
+      throw new NotFoundException('not found task');
+    }
+
+    await this.tasksService.isCreatorOfProject(task.project.id, user.id);
+
+    await this.tasksService.removeTask(parseInt(id));
+    return res.status(HttpStatus.OK).json({
+      data: null,
+      statusCode: HttpStatus.OK,
+      message: 'task removed successfully',
+    });
+  }
 }
