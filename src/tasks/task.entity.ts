@@ -39,8 +39,8 @@ export class Task {
 
   @ManyToOne(() => Project, (project) => project.tasks, { nullable: false })
   project: Project;
-
-  @ManyToMany(() => User, (user) => user.tasks)
+  //cascade => when delete task = all m:m relation delete as well
+  @ManyToMany(() => User, (user) => user.tasks, { cascade: true })
   users: User[];
 
   @CreateDateColumn({

@@ -116,7 +116,7 @@ export class TasksService {
   async getOneTask(id: number) {
     const task = await this.tasksRepository.findOne({
       where: { id },
-      relations: ['users','project'],
+      relations: ['users', 'project'],
     });
     if (!task) {
       throw new NotFoundException('not found task');
@@ -177,7 +177,6 @@ export class TasksService {
   }
 
   async updateStatus(id: number, status: TasStatusEnum) {
-    
     const task = await this.tasksRepository.findOne({ where: { id } });
     if (!task) {
       throw new NotFoundException('not found task');
@@ -190,10 +189,18 @@ export class TasksService {
     return updateTaskStatus;
   }
 
-  async removeTask(id:number){
-   const removedTask = await this.tasksRepository.delete(id)
-   if (removedTask.affected === 0) {
-    throw new NotFoundException('not found project');
-  }
+  async removeTask(id: number) {
+    const task = await this.tasksRepository.findOne({
+      where: { id },
+      relations: ['users', 'project'], // must get all relations because use casecade true
+    });
+
+    if (!task) {
+      throw new NotFoundException('task not found');
+    }
+
+    //ponit=>when casecade it true must use just remove method ... delete method dont work
+
+    await this.tasksRepository.remove(task);
   }
 }
